@@ -1,6 +1,20 @@
 class RefreshCertificateWorker
   include Sidekiq::Worker
 
+  class AuthSet
+    attr_accessor :label, :record_type, :values
+
+    def initialize(label, record_type)
+      @label = label
+      @record_type = record_type
+      @values = Set.new([])
+    end
+
+    def matches_zone_name?(zone_name)
+      (label + '.').ends_with?(zone_name)
+    end
+  end
+
   attr_reader :site
 
   def perform(site_id)
@@ -12,32 +26,31 @@ class RefreshCertificateWorker
 
     order = client.new_order(identifiers: domain_list)
 
-    authorizations = order.authorizations
+    authorizations = build_auth_sets_from_order(order)
 
     route53 = Aws::Route53::Client.new(
       region: 'us-east-1'
     )
 
     zones = route53.list_hosted_zones(max_items: 100).hosted_zones
-    
+
     zones.each do |zone|
-      auths = authorizations.select { |d| (d.identifier['value'] + '.').ends_with?(zone.name) }
+      auths = authorizations.select { |a| a.matches_zone_name?(zone.name) }
 
       next if auths.length == 0
 
-      changes = auths.map do |auth|
-        challenge = auth.dns
+      # wildcards give multiple values so we have to build multiple resource records for a given name
 
-        record_name = "#{challenge.record_name}.#{auth.identifier['value']}"
+      changes = auths.map do |auth|
         {
           action: "UPSERT",
           resource_record_set: {
-            name: record_name,
-            type: challenge.record_type,
+            name: auth.label,
+            type: auth.record_type,
             ttl: 1,
-            resource_records: [
-              { value: %Q{"#{challenge.record_content}"} }
-            ]
+            resource_records: auth.values.map { |v|
+              { value: %Q{"#{v}"} }
+            }
           }
         }
       end
@@ -49,19 +62,19 @@ class RefreshCertificateWorker
         }
       }
 
-      pp route53.change_resource_record_sets(opts)
+      route53.change_resource_record_sets(opts)
     end
 
     Rails.logger.info "action=refresh site=#{site.id} status=waiting_for_dns"
     sleep 1 while !check_dns(authorizations)
 
-    authorizations.each do |auth|
+    order.authorizations.each do |auth|
       auth.dns.request_validation
     end
 
     Rails.logger.info "action=refresh site=#{site.id} status=waiting_for_challenge"
     while true
-      statuses = Set.new(authorizations.map { |a| a.dns.reload; a.dns.status })
+      statuses = Set.new(order.authorizations.map { |a| a.dns.reload; a.dns.status })
       if statuses.include?('pending')
         sleep(2)
         next
@@ -88,21 +101,17 @@ class RefreshCertificateWorker
     valid = true
 
     authorizations.each do |auth|
-      domain = auth.identifier['value']
-      value = auth.dns.record_content
-
-      nameservers = get_nameservers(auth.identifier['value'])
+      nameservers = get_nameservers(auth.label)
 
       nameservers.each do |ns|
         Resolv::DNS.open(nameserver: ns) do |dns|
-          resource_name = "_acme-challenge.#{domain}"
-          Rails.logger.debug "action=refresh site=#{site.id} resolve=checking name=#{resource_name} ns=#{ns}"
+          Rails.logger.debug "action=refresh site=#{site.id} resolve=checking name=#{auth.label} ns=#{ns}"
           begin
-            resource = dns.getresource(resource_name, Resolv::DNS::Resource::IN::TXT)
-            pp [value, resource.strings[0]]
-            valid = value == resource.strings[0]            
+            resources = dns.getresources(auth.label, Resolv::DNS::Resource::IN::TXT).map(&:strings).flatten
+            
+            valid = auth.values == Set.new(resources)
           rescue Resolv::ResolvError
-            Rails.logger.debug "action=refresh site=#{site.id} resolve=error name=#{resource_name} ns=#{ns}"
+            Rails.logger.debug "action=refresh site=#{site.id} resolve=error name=#{auth.label} ns=#{ns}"
             return false
           end
 
@@ -126,6 +135,22 @@ class RefreshCertificateWorker
     end
 
     return result
+  end
+
+
+  def build_auth_sets_from_order(order)
+    auth_sets = {}
+
+    order.authorizations.each do |authorization|
+      label = "_acme-challenge.#{authorization.identifier['value']}"
+      record_type = authorization.dns.record_type
+      value = authorization.dns.record_content
+
+      auth_sets[label] ||= AuthSet.new(label, record_type)
+      auth_sets[label].values.add(value)
+    end
+
+    auth_sets.values
   end
   
 end
