@@ -1,0 +1,4 @@
+---
+refresh_all_certificates:
+  cron: '10 5 * * *'
+  class: 'RefreshAllCertificatesWorker'

@@ -67,5 +67,6 @@ gem 'administrate'
 gem 'acme-client'
 gem 'aws-sdk', '~> 2'
 gem 'sidekiq'
+gem 'sidekiq-cron'
 gem 'sinatra'
 
