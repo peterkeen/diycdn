@@ -6,8 +6,8 @@ class RefreshCertificateWorker
   def perform(site_id)
     @site = Site.find(site_id)
 
-    key = OpenSSL::PKey::RSA.new(Rails.application.credentials[Rails.env.to_sym][:acme_private_key])
-    client = Acme::Client.new(private_key: key, directory: Rails.application.credentials[Rails.env.to_sym][:acme_directory])
+    key = OpenSSL::PKey::RSA.new(ENV['ACME_PRIVATE_KEY'])
+    client = Acme::Client.new(private_key: key, directory: ENV['ACME_DIRECTORY'])
     domain_list = site.domain_list.split(/\s+/).map(&:strip)
 
     order = client.new_order(identifiers: domain_list)
@@ -15,9 +15,7 @@ class RefreshCertificateWorker
     authorizations = order.authorizations
 
     route53 = Aws::Route53::Client.new(
-      region: 'us-east-1',
-      access_key_id: Rails.application.credentials[Rails.env.to_sym][:aws_access_key_id],
-      secret_access_key: Rails.application.credentials[Rails.env.to_sym][:aws_secret_access_key]
+      region: 'us-east-1'
     )
 
     zones = route53.list_hosted_zones(max_items: 100).hosted_zones
