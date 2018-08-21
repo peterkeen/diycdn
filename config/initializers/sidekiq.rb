@@ -6,8 +6,7 @@ Sidekiq.configure_server do |config|
   if File.exist?(schedule_file) && Sidekiq.server?
     puts "loading cron schedule from #{schedule_file}"
     schedule = YAML.load_file(schedule_file)
-    pp schedule
-    pp Sidekiq::Cron::Job.load_from_hash! schedule
+    Sidekiq::Cron::Job.load_from_hash! schedule
   end
 end
 
