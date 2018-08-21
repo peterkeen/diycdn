@@ -1,2 +1,2 @@
-web: rackup -p $PORT
-worker: sidekiq
+web: bin/web
+worker: bin/worker

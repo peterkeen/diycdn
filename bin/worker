@@ -1,0 +1,3 @@
+#!/bin/bash
+
+sidekiq | logger -t cdn-worker
