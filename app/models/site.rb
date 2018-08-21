@@ -1,9 +1,9 @@
 require 'resolv'
 
 class Site < ApplicationRecord
-  after_save :refresh_certificate!
+  after_commit :refresh_certificate!, if: :saved_change_to_domain_list?
 
   def refresh_certificate!
-    RefreshCertificateWorker.perform_async(self.id) if domain_list_changed?
+    RefreshCertificateWorker.perform_async(self.id)
   end
 end
