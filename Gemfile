@@ -72,3 +72,4 @@ gem 'sinatra'
 
 gem "capistrano", '2.15.4'
 gem "capistrano-buildpack", '0.0.18'
+gem 'zip'
