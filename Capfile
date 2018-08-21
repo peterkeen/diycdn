@@ -20,6 +20,9 @@ set :listen_address, '10.248.9.84'
 set :foreman_export_path, "/lib/systemd/system"
 set :foreman_export_type, "systemd"
 
+set :ssl_cert_path, '/etc/nginx/certificates/site-1/fullchain.pem'
+set :ssl_key_path, '/etc/nginx/certificates/site-1/privkey.pem'
+
 read_env 'prod'
 
 load 'deploy'
