@@ -28,3 +28,4 @@
 .env
 .env*
 .DS_Store
+acme_key.pem
