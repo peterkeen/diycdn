@@ -1,0 +1,41 @@
+proxy_cache_path /var/nginx/cache levels=1:2 keys_zone=sites_cache:10m max_size=10g 
+                 inactive=60m use_temp_path=off;
+
+<%- Site.with_upstream.find_each do |site| -%>
+upstream <%= site.upstream_name %> {
+  server <%= site.upstream %> fail_timeout=0;
+
+  keepalive 16;
+}
+
+server {
+  listen 80;
+  listen 443 ssl http2;
+  ssl_certificate /etc/nginx/certificates/site-<%= site.id %>/fullchain.pem;
+  ssl_certificate_key /etc/nginx/certificates/site-<%= site.id %>/privkey.pem;
+
+  server_name <%= site.server_name %>;
+
+  if ($ssl_protocol = "") {
+     rewrite ^(.*)$ https://$server_name$request_uri? permanent;
+  }
+
+  location / {
+    proxy_http_version 1.1;
+
+    proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+    proxy_set_header X-Forwarded-Proto $scheme;
+    proxy_set_header Host $http_host;
+    proxy_set_header Connection "";
+    proxy_redirect off;
+
+    proxy_cache sites_cache;
+    proxy_cache_revalidate on;
+    proxy_cache_use_stale error timeout updating http_500 http_502 http_503 http_504;
+    proxy_cache_background_update on;
+    proxy_cache_lock on;
+  
+    proxy_pass http://<%= site.upstream_name %>; 
+  }
+}
+<% end %>

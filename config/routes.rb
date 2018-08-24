@@ -17,4 +17,5 @@ end if Rails.env.production?
   end
 
   resources :certificates, only: [:index]
+  resources :configurations, only: [:index]
 end
