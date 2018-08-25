@@ -18,7 +18,7 @@ class Site < ApplicationRecord
   end
 
   def upstream_server
-    uri = URI(uptream)
+    uri = URI(upstream)
 
     if uri.port.nil?
       if uri.scheme == 'https'
@@ -34,6 +34,6 @@ class Site < ApplicationRecord
   end
 
   def upstream_scheme
-    URI(uptream).scheme
+    URI(upstream).scheme
   end
 end
