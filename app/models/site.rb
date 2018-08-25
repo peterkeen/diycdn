@@ -16,4 +16,24 @@ class Site < ApplicationRecord
   def upstream_name
     "upstream-site-#{id}"
   end
+
+  def upstream_server
+    uri = URI(uptream)
+
+    if uri.port.nil?
+      if uri.scheme == 'https'
+        port = '443'
+      else
+        port = '80'
+      end
+    else
+      port = uri.port
+    end
+
+    "#{uri.host}:#{port}"
+  end
+
+  def upstream_scheme
+    URI(uptream).scheme
+  end
 end

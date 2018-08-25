@@ -3,7 +3,7 @@ proxy_cache_path /var/nginx/cache levels=1:2 keys_zone=sites_cache:10m max_size=
 
 <%- Site.with_upstream.find_each do |site| -%>
 upstream <%= site.upstream_name %> {
-  server <%= site.upstream %> fail_timeout=0;
+  server <%= site.upstream_server %> fail_timeout=0;
 
   keepalive 16;
 }
@@ -35,7 +35,7 @@ server {
     proxy_cache_background_update on;
     proxy_cache_lock on;
   
-    proxy_pass http://<%= site.upstream_name %>; 
+    proxy_pass <%= site.upstream_scheme %>://<%= site.upstream_name %>; 
   }
 }
 <% end %>
