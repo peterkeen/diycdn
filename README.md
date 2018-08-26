@@ -27,3 +27,8 @@ These thigns are now working:
 * update script (download certificates and nginx config, restart nginx)
 * update script is a server-controlled noop unless a site or proxy has updated since the certificates zipfile was last downloaded
 
+Next steps:
+
+* Switch to production LetsEncrypt
+* Teach app how to set up proxies as geo-latency A and AAAA records for labels in domain_list for each site
+* Set up a real site
