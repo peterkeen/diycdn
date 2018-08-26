@@ -18,4 +18,7 @@ end if Rails.env.production?
 
   resources :certificates, only: [:index]
   resources :configurations, only: [:index]
+
+  get '/setup' => 'scripts#setup'
+  get '/update' => 'scripts#update'
 end

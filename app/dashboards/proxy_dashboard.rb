@@ -14,6 +14,7 @@ class ProxyDashboard < Administrate::BaseDashboard
     api_key: Field::String,
     created_at: Field::DateTime,
     updated_at: Field::DateTime,
+    last_seen_at: Field::DateTime,
   }.freeze
 
   # COLLECTION_ATTRIBUTES
@@ -26,6 +27,7 @@ class ProxyDashboard < Administrate::BaseDashboard
     :external_hostname,
     :internal_hostname,
     :api_key,
+    :last_seen_at,
   ].freeze
 
   # SHOW_PAGE_ATTRIBUTES
@@ -37,6 +39,7 @@ class ProxyDashboard < Administrate::BaseDashboard
     :api_key,
     :created_at,
     :updated_at,
+    :last_seen_at,
   ].freeze
 
   # FORM_ATTRIBUTES

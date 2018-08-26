@@ -28,7 +28,7 @@ class SiteDashboard < Administrate::BaseDashboard
     :id,
     :name,
     :domain_list,
-    :certificate,
+    :upstream,
   ].freeze
 
   # SHOW_PAGE_ATTRIBUTES
@@ -39,7 +39,6 @@ class SiteDashboard < Administrate::BaseDashboard
     :domain_list,
     :certificate,
     :private_key,
-    :expires_at,
     :upstream,
     :created_at,
     :updated_at,
@@ -51,9 +50,6 @@ class SiteDashboard < Administrate::BaseDashboard
   FORM_ATTRIBUTES = [
     :name,
     :domain_list,
-    :certificate,
-    :private_key,
-    :expires_at,
     :upstream,
   ].freeze
 

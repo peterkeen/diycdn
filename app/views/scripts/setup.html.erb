@@ -1,0 +1,20 @@
+#!/bin/bash
+set -e
+set -o pipefail
+
+apt-get update
+apt-get install -y nginx
+
+cat <<EOF > /root/update_proxy.sh
+#!/bin/bash
+set -e
+set -o pipefail         
+
+curl -k -H 'Authorization: Bearer <%= @current_proxy.api_key %>' https://cdn.kodos.zrail.net/update | bash
+EOF
+
+chmod +x /root/update_proxy.sh
+
+cat <<EOF > /etc/cron.d/proxy-update
+* * * * * root /root/update_proxy.sh
+EOF
