@@ -36,4 +36,8 @@ class Site < ApplicationRecord
   def upstream_scheme
     URI(upstream).scheme
   end
+
+  def domains
+    domain_list.split(/\s+/).map(&:strip)    
+  end
 end

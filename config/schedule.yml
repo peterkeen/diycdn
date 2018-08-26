@@ -2,3 +2,7 @@
 refresh_all_certificates:
   cron: '10 5 * * *'
   class: 'RefreshAllCertificatesWorker'
+
+refresh_records:
+  cron: '* * * * *'
+  class: 'RefreshRecordsWorker'

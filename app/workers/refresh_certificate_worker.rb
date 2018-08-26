@@ -22,7 +22,7 @@ class RefreshCertificateWorker
 
     key = OpenSSL::PKey::RSA.new(File.read(ENV['ACME_PRIVATE_KEY_PATH']))
     client = Acme::Client.new(private_key: key, directory: ENV['ACME_DIRECTORY'])
-    domain_list = site.domain_list.split(/\s+/).map(&:strip)
+    domain_list = site.domains
 
     order = client.new_order(identifiers: domain_list)
 
