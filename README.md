@@ -17,6 +17,15 @@ This is a Rails app that will eventually power my tiny DIY content distribution 
 
 ## Changelog
 
+### 2018-08-26
+
+App can now set up latency-based A and AAAA records for sites
+
+Next steps:
+
+* Use the `last_seen_at` Proxy attribute to pull proxies out of rotation that don't check in
+* Switch to production LE & set up a real site
+
 ### 2018-08-25
 
 These thigns are now working:
