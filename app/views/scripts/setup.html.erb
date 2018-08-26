@@ -10,7 +10,9 @@ cat <<'EOF' > /root/update_proxy.sh
 set -e
 set -o pipefail
 
-last_modified=`stat -c %Y /etc/nginx/certificates.zip`
+if [[ -f /etc/nginx/certificates.zip ]]; then
+    last_modified=`stat -c %Y /etc/nginx/certificates.zip`
+fi
 
 curl -s -S -k -H 'Authorization: Bearer <%= @current_proxy.api_key %>' "https://cdn.kodos.zrail.net/update?m=$last_modified" | bash
 EOF
