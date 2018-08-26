@@ -5,9 +5,9 @@ set -o pipefail
 
 cd /etc/nginx
 
-curl -k -H 'Authorization: Bearer <%= @current_proxy.api_key %>' https://cdn.kodos.zrail.net/certificates > certificates.zip
-unzip -o certificates.zip
+curl -s -S -k -H 'Authorization: Bearer <%= @current_proxy.api_key %>' https://cdn.kodos.zrail.net/certificates > certificates.zip
+unzip -qq -o certificates.zip
 
-curl -k -H 'Authorization: Bearer <%= @current_proxy.api_key %>' https://cdn.kodos.zrail.net/configurations > sites-available/proxies.conf
+curl -s -S -k -H 'Authorization: Bearer <%= @current_proxy.api_key %>' https://cdn.kodos.zrail.net/configurations > sites-available/proxies.conf
 
 systemctl restart nginx
