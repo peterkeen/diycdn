@@ -5,7 +5,7 @@ set -o pipefail
 apt-get update
 apt-get install -y nginx
 
-cat <<EOF > /root/update_proxy.sh
+cat <<'EOF' > /root/update_proxy.sh
 #!/bin/bash
 set -e
 set -o pipefail
