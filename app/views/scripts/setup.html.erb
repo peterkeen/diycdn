@@ -10,7 +10,7 @@ cat <<EOF > /root/update_proxy.sh
 set -e
 set -o pipefail         
 
-curl -k -H 'Authorization: Bearer <%= @current_proxy.api_key %>' https://cdn.kodos.zrail.net/update | bash
+curl -s -S -k -H 'Authorization: Bearer <%= @current_proxy.api_key %>' https://cdn.kodos.zrail.net/update | bash
 EOF
 
 chmod +x /root/update_proxy.sh
