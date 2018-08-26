@@ -8,9 +8,11 @@ apt-get install -y nginx
 cat <<EOF > /root/update_proxy.sh
 #!/bin/bash
 set -e
-set -o pipefail         
+set -o pipefail
 
-curl -s -S -k -H 'Authorization: Bearer <%= @current_proxy.api_key %>' https://cdn.kodos.zrail.net/update | bash
+last_modified=`stat -c %Y /etc/nginx/certificates.zip`
+
+curl -s -S -k -H 'Authorization: Bearer <%= @current_proxy.api_key %>' "https://cdn.kodos.zrail.net/update?m=$last_modified" | bash
 EOF
 
 chmod +x /root/update_proxy.sh
