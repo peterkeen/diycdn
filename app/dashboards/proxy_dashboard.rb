@@ -15,6 +15,7 @@ class ProxyDashboard < Administrate::BaseDashboard
     created_at: Field::DateTime,
     updated_at: Field::DateTime,
     last_seen_at: Field::DateTime,
+    certificates_only: Field::Boolean,
   }.freeze
 
   # COLLECTION_ATTRIBUTES
@@ -37,6 +38,7 @@ class ProxyDashboard < Administrate::BaseDashboard
     :external_hostname,
     :internal_hostname,
     :api_key,
+    :certificates_only,
     :created_at,
     :updated_at,
     :last_seen_at,
@@ -48,6 +50,7 @@ class ProxyDashboard < Administrate::BaseDashboard
   FORM_ATTRIBUTES = [
     :external_hostname,
     :internal_hostname,
+    :certificates_only,
   ].freeze
 
   # Overwrite this method to customize how proxies are displayed

@@ -9,7 +9,9 @@ cd /etc/nginx
 curl -s -S -k -H 'Authorization: Bearer <%= @current_proxy.api_key %>' https://cdn.kodos.zrail.net/certificates > certificates.zip
 unzip -qq -o certificates.zip
 
+<% unless @current_proxy.certificates_only? %>
 curl -s -S -k -H 'Authorization: Bearer <%= @current_proxy.api_key %>' https://cdn.kodos.zrail.net/configurations > sites-available/proxies.conf
+<% end %>
 
 systemctl restart nginx
 <% end %>
