@@ -13,4 +13,17 @@ This is a Rails app that will eventually power my tiny DIY content distribution 
 ## scripts
 
 * `setup` install nginx, create update cron
-* `update` one-minute cron, update certificates and config with last-updated-at. if there are updates, extract new certificates fil, restart nginx
+* `update` one-minute cron, update certificates and config with last-updated-at. if there are updates, extract new certificates file, restart nginx
+
+## Changelog
+
+### 2018-08-25
+
+These thigns are now working:
+
+* creating or updating a site's domain list will generate a LetsEncrypt certificate
+* nginx config generation
+* setup script (install nginx, create update `curl | bash` shim, set up cron)
+* update script (download certificates and nginx config, restart nginx)
+* update script is a server-controlled noop unless a site or proxy has updated since the certificates zipfile was last downloaded
+
