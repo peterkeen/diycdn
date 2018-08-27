@@ -1,7 +1,7 @@
 proxy_cache_path /var/nginx/cache levels=1:2 keys_zone=sites_cache:10m max_size=10g 
                  inactive=60m use_temp_path=off;
 
-<%- Site.with_upstream.find_each do |site| -%>
+<%- Site.with_upstream.with_certificate.find_each do |site| -%>
 upstream <%= site.upstream_name %> {
   server <%= site.upstream_server %> fail_timeout=0;
 
