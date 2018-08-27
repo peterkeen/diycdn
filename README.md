@@ -17,6 +17,10 @@ This is a Rails app that will eventually power my tiny DIY content distribution 
 
 ## Changelog
 
+### 2018-08-26 (evening)
+
+Switched to production LE and set up corastreetpress.com. Everything seems to be working as expected.
+
 ### 2018-08-26
 
 App can now set up latency-based A and AAAA records for sites
