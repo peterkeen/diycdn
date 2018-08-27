@@ -5,6 +5,9 @@ set -o pipefail
 apt-get update
 apt-get install -y nginx unzip
 
+mkdir -p /var/nginx/cache
+rm /etc/nginx/sites-enabled/default
+
 cat <<'EOF' > /root/update_proxy.sh
 #!/bin/bash
 set -e
