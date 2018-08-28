@@ -10,10 +10,13 @@ upstream <%= site.upstream_name %> {
 
 server {
   listen 80;
+  listen [::]:443 ssl http2 ipv6only=on;
   listen 443 ssl http2;
 
   ssl_certificate /etc/nginx/certificates/site-<%= site.id %>/fullchain.pem;
   ssl_certificate_key /etc/nginx/certificates/site-<%= site.id %>/privkey.pem;
+
+  ssl_ciphers EECDH+CHACHA20:EECDH+AES128:RSA+AES128:EECDH+AES256:RSA+AES256:EECDH+3DES:RSA+3DES:!MD5;
 
   server_name <%= site.server_name %>;
 
