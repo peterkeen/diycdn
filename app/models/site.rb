@@ -3,8 +3,12 @@ require 'resolv'
 class Site < ApplicationRecord
   after_commit :refresh_certificate!, if: :saved_change_to_domain_list?
 
-  scope :with_upstream, -> { where('upstream is not null and upstream != ?', '') }
   scope :with_certificate, -> {where('certificate is not null and certificate != ?', '') }
+
+  scope :configurable -> {
+    with_certificate
+      .where('(upstream is not null and upstream != ?) or push', '')
+  }
 
   def refresh_certificate!
     RefreshCertificateWorker.perform_async(self.id)

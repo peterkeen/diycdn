@@ -15,6 +15,7 @@ class SiteDashboard < Administrate::BaseDashboard
     private_key: Field::Text,
     expires_at: Field::DateTime,
     upstream: Field::Text,
+    push: Field::Boolean,
     created_at: Field::DateTime,
     updated_at: Field::DateTime,
   }.freeze
@@ -29,6 +30,7 @@ class SiteDashboard < Administrate::BaseDashboard
     :name,
     :domain_list,
     :upstream,
+    :push,
   ].freeze
 
   # SHOW_PAGE_ATTRIBUTES
@@ -40,6 +42,7 @@ class SiteDashboard < Administrate::BaseDashboard
     :certificate,
     :private_key,
     :upstream,
+    :push,
     :created_at,
     :updated_at,
   ].freeze
@@ -51,6 +54,7 @@ class SiteDashboard < Administrate::BaseDashboard
     :name,
     :domain_list,
     :upstream,
+    :push,
   ].freeze
 
   # Overwrite this method to customize how sites are displayed

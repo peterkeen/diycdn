@@ -13,6 +13,10 @@ unzip -qq -o certificates.zip
 curl -s -S -k -H 'Authorization: Bearer <%= @current_proxy.api_key %>' https://cdn.kodos.zrail.net/configurations > sites-enabled/proxies.conf
 <% end %>
 
+<% Site.configurable.where(push: true).each do |site| %>
+mkdir -p /var/www/site-<% site.id %>
+<% end %>
+
 systemctl restart nginx
 <% end %>
 
