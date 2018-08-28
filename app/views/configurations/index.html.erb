@@ -18,6 +18,8 @@ server {
 
   ssl_ciphers EECDH+CHACHA20:EECDH+AES128:RSA+AES128:EECDH+AES256:RSA+AES256:EECDH+3DES:RSA+3DES:!MD5;
 
+  ssl_dhparam /etc/nginx/dhparam.pem;
+
   server_name <%= site.server_name %>;
 
   if ($ssl_protocol = "") {
