@@ -32,7 +32,7 @@ Next steps:
 
 ### 2018-08-25
 
-These thigns are now working:
+These things are now working:
 
 * creating or updating a site's domain list will generate a LetsEncrypt certificate
 * nginx config generation
@@ -45,3 +45,8 @@ Next steps:
 * Switch to production LetsEncrypt
 * Teach app how to set up proxies as geo-latency A and AAAA records for labels in domain_list for each site
 * Set up a real site
+
+## TODO
+
+* coordinate proxy admin with capistrano
+* investigate SSH certificate authority
