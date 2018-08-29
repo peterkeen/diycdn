@@ -5,7 +5,7 @@ class Site < ApplicationRecord
 
   scope :with_certificate, -> {where('certificate is not null and certificate != ?', '') }
 
-  scope :configurable -> {
+  scope :configurable, -> {
     with_certificate
       .where('(upstream is not null and upstream != ?) or push', '')
   }
