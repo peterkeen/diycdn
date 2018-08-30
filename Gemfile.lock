@@ -1,6 +1,8 @@
 GEM
   remote: https://rubygems.org/
   specs:
+    aasm (5.0.0)
+      concurrent-ruby (~> 1.0)
     acme-client (2.0.0)
       faraday (~> 0.9, >= 0.9.1)
     actioncable (5.2.1)
@@ -282,6 +284,7 @@ PLATFORMS
   ruby
 
 DEPENDENCIES
+  aasm
   acme-client
   administrate
   aws-sdk (~> 2)

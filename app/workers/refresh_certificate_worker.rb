@@ -101,42 +101,24 @@ class RefreshCertificateWorker
     valid = true
 
     authorizations.each do |auth|
-      nameservers = get_nameservers(auth.label)
+      nameservers = DnsUtils.nameservers(auth.label)
 
       nameservers.each do |ns|
-        Resolv::DNS.open(nameserver: ns) do |dns|
-          Rails.logger.debug "action=refresh site=#{site.id} resolve=checking name=#{auth.label} ns=#{ns}"
-          begin
-            resources = dns.getresources(auth.label, Resolv::DNS::Resource::IN::TXT).map(&:strings).flatten
-            
-            valid = auth.values == Set.new(resources)
-          rescue Resolv::ResolvError
-            Rails.logger.debug "action=refresh site=#{site.id} resolve=error name=#{auth.label} ns=#{ns}"
-            return false
-          end
-
-          return false if !valid
+        Rails.logger.debug "action=refresh site=#{site.id} resolve=checking name=#{auth.label} ns=#{ns}"
+        begin
+          DnsUtils.records(auth.label, Resolv::DNS::Resource::IN::TXT).map(&:strings).flatten
+          valid = auth.values == Set.new(resources)
+        rescue Resolv::ResolvError
+          Rails.logger.debug "action=refresh site=#{site.id} resolve=error name=#{auth.label} ns=#{ns}"
+          return false
         end
+
+        return false if !valid
       end
     end
 
     valid
   end
-
-  def get_nameservers(domain)
-    domain = domain.dup
-    result = []
-
-    Resolv::DNS.open(nameserver: '8.8.8.8') do |dns|
-      while result.length == 0
-        result = dns.getresources(domain, Resolv::DNS::Resource::IN::NS).map(&:name).map(&:to_s)
-        domain = domain.split(/\./).drop(1).join('.')
-      end
-    end
-
-    return result
-  end
-
 
   def build_auth_sets_from_order(order)
     auth_sets = {}

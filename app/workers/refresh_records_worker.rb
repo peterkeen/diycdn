@@ -47,4 +47,47 @@ class RefreshRecordsWorker
       route53.change_resource_record_sets(opts)
     end
   end
+
+  def change(label, proxy, record_type, method)
+    if needs_delete?(label, proxy, record_type, method)
+      {
+        action: 'DELETE',
+        resource_record_set: {
+          name: match,
+          type: record_type,
+          ttl: 60,
+          region: proxy.region,
+          set_identifier: "zone #{zone.id} region #{proxy.region}",
+          resource_records: proxy.send(method).map { |ip|
+            { value: ip }
+          }
+        }
+      }      
+    else
+      {
+        action: 'UPSERT',
+        resource_record_set: {
+          name: match,
+          type: record_type,
+          ttl: 60,
+          region: proxy.region,
+          set_identifier: "zone #{zone.id} region #{proxy.region}",
+          resource_records: proxy.send(method).map { |ip|
+            { value: ip }
+          }
+        }
+      }
+    end
+  end
+
+  def needs_delete?(label, proxy, record_type, method)
+    return false if proxy.active?
+
+    nameserver = DnsUtils.nameservers(label).first
+    ips = DnsUtils.records(label, record_type, nameserver: nameserver).map(&:address).map(&:to_s)
+
+    proxy_ips = Set.new(proxy.send(method))
+
+    ips.intersect?(proxy_ips)
+  end
 end

@@ -17,6 +17,12 @@ This is a Rails app that will eventually power my tiny DIY content distribution 
 
 ## Changelog
 
+### 2018-08-30
+
+* Made the cache last forever
+* added rudiumentary "push" zones but not using it yet because the deploy story isn't ready
+* can now deactiate proxies
+
 ### 2018-08-26 (evening)
 
 Switched to production LE and set up corastreetpress.com. Everything seems to be working as expected.
@@ -48,5 +54,6 @@ Next steps:
 
 ## TODO
 
+* log rotate + remote_syslog2
 * coordinate proxy admin with capistrano
 * investigate SSH certificate authority

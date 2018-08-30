@@ -16,6 +16,9 @@ class ProxyDashboard < Administrate::BaseDashboard
     updated_at: Field::DateTime,
     last_seen_at: Field::DateTime,
     certificates_only: Field::Boolean,
+    aasm_state: Field::Select.with_options(
+      collection: ['active', 'inactive'],
+    ),
   }.freeze
 
   # COLLECTION_ATTRIBUTES
@@ -26,8 +29,7 @@ class ProxyDashboard < Administrate::BaseDashboard
   COLLECTION_ATTRIBUTES = [
     :id,
     :external_hostname,
-    :internal_hostname,
-    :api_key,
+    :aasm_state,
     :last_seen_at,
   ].freeze
 
@@ -39,6 +41,7 @@ class ProxyDashboard < Administrate::BaseDashboard
     :internal_hostname,
     :api_key,
     :certificates_only,
+    :aasm_state,
     :created_at,
     :updated_at,
     :last_seen_at,
@@ -51,6 +54,7 @@ class ProxyDashboard < Administrate::BaseDashboard
     :external_hostname,
     :internal_hostname,
     :certificates_only,
+    :aasm_state
   ].freeze
 
   # Overwrite this method to customize how proxies are displayed
