@@ -108,7 +108,7 @@ class RefreshCertificateWorker
       nameservers.each do |ns|
         Rails.logger.debug "action=refresh site=#{site.id} resolve=checking name=#{auth.label} ns=#{ns}"
         begin
-          DnsUtils.records(auth.label, Resolv::DNS::Resource::IN::TXT).map(&:strings).flatten
+          DnsUtils.records(auth.label, Resolv::DNS::Resource::IN::TXT, ns).map(&:strings).flatten
           valid = auth.values == Set.new(resources)
         rescue Resolv::ResolvError
           Rails.logger.debug "action=refresh site=#{site.id} resolve=error name=#{auth.label} ns=#{ns}"
