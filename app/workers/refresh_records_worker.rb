@@ -3,6 +3,8 @@ require 'dns_utils'
 class RefreshRecordsWorker
   include Sidekiq::Worker
 
+  sidekiq_options retry: false
+
   def perform
     route53 = Aws::Route53::Client.new(
       region: 'us-east-1'
