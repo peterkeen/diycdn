@@ -20,7 +20,7 @@ class RefreshRecordsWorker
       matches.each do |match|
         proxies.each do |proxy|
           [['A', :ipv4], ['AAAA', :ipv6]].each do |record_type, method|
-            changes += change(match, proxy, record_type, method, zone, route53)
+            changes << change(match, proxy, record_type, method, zone, route53)
           end
         end
       end
