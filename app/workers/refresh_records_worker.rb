@@ -85,8 +85,13 @@ class RefreshRecordsWorker
   def needs_delete?(label, proxy, record_type, method)
     return false if proxy.active?
 
+    record_class = {
+      'A' => Resolv::DNS::Resource::IN::A,
+      'AAAA' => Resolv::DNS::Resource::IN::AAAA
+    }[record_type]
+
     nameserver = DnsUtils.nameservers(label).first
-    ips = DnsUtils.records(label, record_type, nameserver: nameserver).map(&:address).map(&:to_s)
+    ips = DnsUtils.records(label, record_class, nameserver: nameserver).map(&:address).map(&:to_s)
 
     proxy_ips = Set.new(proxy.send(method))
 
