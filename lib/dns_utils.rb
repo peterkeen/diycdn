@@ -1,3 +1,5 @@
+require 'resolv'
+
 module DnsUtils
   def nameservers(domain)
     domain = domain.dup

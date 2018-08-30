@@ -1,4 +1,4 @@
-require 'resolv'
+require 'dns_utils'
 
 class Proxy < ApplicationRecord
   include AASM  

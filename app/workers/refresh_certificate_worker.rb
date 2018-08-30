@@ -1,3 +1,5 @@
+require 'dns_utils'
+
 class RefreshCertificateWorker
   include Sidekiq::Worker
 
