@@ -21,7 +21,7 @@ This is a Rails app that will eventually power my tiny DIY content distribution 
 
 * Made the cache last forever
 * added rudiumentary "push" zones but not using it yet because the deploy story isn't ready
-* can now deactiate proxies
+* can now deactiate proxies and have them automatically taken out of the pool
 
 ### 2018-08-26 (evening)
 
