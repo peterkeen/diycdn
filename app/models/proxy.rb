@@ -10,7 +10,7 @@ class Proxy < ApplicationRecord
     state :active
     state :inactive
 
-    event :activate, after: :update_last_seen do
+    event :activate do
       transitions from: [:new, :inactive], to: :active
     end
 

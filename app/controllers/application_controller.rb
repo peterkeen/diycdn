@@ -5,7 +5,8 @@ class ApplicationController < ActionController::Base
       proxy = Proxy.find_by(api_key: token)
       if proxy
         @current_proxy = proxy
-        @current_proxy.activate!
+        @current_proxy.activate! if @current_proxy.new?
+        @current_proxy.update_last_seen
         return true
       end
     end
