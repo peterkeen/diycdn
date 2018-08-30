@@ -84,6 +84,6 @@ class RefreshRecordsWorker
 
     proxy_ips = Set.new(proxy.send(method))
 
-    ips.intersect?(proxy_ips)
+    Set.new(ips).intersect?(proxy_ips)
   end
 end
