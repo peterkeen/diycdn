@@ -91,7 +91,7 @@ class RefreshRecordsWorker
     }[record_type]
 
     nameserver = DnsUtils.nameservers(label).first
-    ips = DnsUtils.records(label, record_class, nameserver).map(&:address).map(&:to_s)
+    ips = Set.new(DnsUtils.records(label, record_class, nameserver).map(&:address).map(&:to_s))
 
     proxy_ips = Set.new(proxy.send(method))
 
