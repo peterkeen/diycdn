@@ -45,7 +45,7 @@ class RefreshRecordsWorker
       {
         action: 'DELETE',
         resource_record_set: {
-          name: match,
+          name: label,
           type: record_type,
           ttl: 60,
           region: proxy.region,
@@ -59,7 +59,7 @@ class RefreshRecordsWorker
       {
         action: 'UPSERT',
         resource_record_set: {
-          name: match,
+          name: label,
           type: record_type,
           ttl: 60,
           region: proxy.region,
