@@ -20,19 +20,7 @@ class RefreshRecordsWorker
       matches.each do |match|
         proxies.each do |proxy|
           [['A', :ipv4], ['AAAA', :ipv6]].each do |record_type, method|
-            changes << {
-              action: 'UPSERT',
-              resource_record_set: {
-                name: match,
-                type: record_type,
-                ttl: 60,
-                region: proxy.region,
-                set_identifier: "zone #{zone.id} region #{proxy.region}",
-                resource_records: proxy.send(method).map { |ip|
-                  { value: ip }
-                }
-              }
-            }
+            changes += change(match, proxy, record_type, method, zone, route53)
           end
         end
       end
@@ -50,8 +38,10 @@ class RefreshRecordsWorker
     end
   end
 
-  def change(label, proxy, record_type, method)
-    if needs_delete?(label, proxy, record_type, method)
+  def change(label, proxy, record_type, method, zone, route53)
+    proxy_ips = proxy.send(method)
+
+    if needs_delete?(label, proxy, record_type, method, zone, route53)
       {
         action: 'DELETE',
         resource_record_set: {
@@ -60,7 +50,7 @@ class RefreshRecordsWorker
           ttl: 60,
           region: proxy.region,
           set_identifier: "zone #{zone.id} region #{proxy.region}",
-          resource_records: proxy.send(method).map { |ip|
+          resource_records: proxy_ips.map { |ip|
             { value: ip }
           }
         }
@@ -74,7 +64,7 @@ class RefreshRecordsWorker
           ttl: 60,
           region: proxy.region,
           set_identifier: "zone #{zone.id} region #{proxy.region}",
-          resource_records: proxy.send(method).map { |ip|
+          resource_records: proxy_ips.map { |ip|
             { value: ip }
           }
         }
