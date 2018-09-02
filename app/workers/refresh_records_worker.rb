@@ -12,7 +12,7 @@ class RefreshRecordsWorker
 
     zones = route53.list_hosted_zones(max_items: 100).hosted_zones
 
-    domains = Site.where("upstream is not null and upstream != ''").pluck(:domain_list).map { |dl| dl.split(/\s+/).map(&:strip) }.flatten
+    domains = Site.where("(upstream is not null and upstream != '') or (s3_bucket is not nulland s3_bucket != ''").pluck(:domain_list).map { |dl| dl.split(/\s+/).map(&:strip) }.flatten
     proxies = Proxy.where('certificates_only is null or certificates_only = false').all
 
     zones.each do |zone|
@@ -76,11 +76,6 @@ class RefreshRecordsWorker
 
   def needs_delete?(label, proxy, record_type, method, zone, route53)
     return false if proxy.active?
-
-    record_class = {
-      'A' => Resolv::DNS::Resource::IN::A,
-      'AAAA' => Resolv::DNS::Resource::IN::AAAA
-    }[record_type]
 
     ips = route53.list_resource_record_sets(hosted_zone_id: zone.id, start_record_type: record_type, start_record_name: label).map(&:resource_record_sets).flatten.select { |r| r.type == record_type }.map { |r| r.resource_records }.flatten.map(&:value)    
 
