@@ -2,6 +2,7 @@ class ScriptsController < ApplicationController
   before_action :authenticate_from_bearer_token!
 
   def setup
+    @current_proxy.update_column(needs_setup: false)
     render :setup, layout: false, content_type: 'text/plain'
   end
 

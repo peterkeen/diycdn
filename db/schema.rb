@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2018_09_02_145031) do
+ActiveRecord::Schema.define(version: 2018_09_02_153120) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
@@ -24,6 +24,7 @@ ActiveRecord::Schema.define(version: 2018_09_02_145031) do
     t.datetime "last_seen_at"
     t.boolean "certificates_only"
     t.string "aasm_state", default: "active"
+    t.boolean "needs_setup", default: false
   end
 
   create_table "sites", force: :cascade do |t|

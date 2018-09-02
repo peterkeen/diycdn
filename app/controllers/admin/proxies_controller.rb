@@ -17,5 +17,13 @@ module Admin
 
     # See https://administrate-prototype.herokuapp.com/customizing_controller_actions
     # for more information
+
+    def force_setup
+      Proxy.find_each do |proxy|
+        proxy.update_column(needs_setup: true)
+      end
+
+      redirect_to :index, notice: "Forced setup"
+    end
   end
 end

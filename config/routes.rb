@@ -10,7 +10,11 @@ end if Rails.env.production?
   namespace :admin do
     mount Sidekiq::Web => '/sidekiq'
 
-    resources :proxies
+    resources :proxies do
+      collection do
+        get :force_setup
+      end
+    end
     resources :sites
 
     root to: "proxies#index"
