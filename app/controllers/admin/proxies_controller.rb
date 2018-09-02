@@ -23,7 +23,7 @@ module Admin
         proxy.update_column(:needs_setup, true)
       end
 
-      redirect_to :index, notice: "Forced setup"
+      redirect_to index_path, notice: "Forced setup"
     end
   end
 end
