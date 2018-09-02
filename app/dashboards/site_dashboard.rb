@@ -16,6 +16,9 @@ class SiteDashboard < Administrate::BaseDashboard
     expires_at: Field::DateTime,
     upstream: Field::Text,
     push: Field::Boolean,
+    s3_bucket: Field::String,
+    s3_access_key_id: Field::String,
+    s3_secret_access_key: Field::String,
     created_at: Field::DateTime,
     updated_at: Field::DateTime,
   }.freeze
@@ -43,6 +46,9 @@ class SiteDashboard < Administrate::BaseDashboard
     :private_key,
     :upstream,
     :push,
+    :s3_bucket,
+    :s3_access_key_id,
+    :s3_secret_access_key,
     :created_at,
     :updated_at,
   ].freeze
@@ -55,6 +61,9 @@ class SiteDashboard < Administrate::BaseDashboard
     :domain_list,
     :upstream,
     :push,
+    :s3_bucket,
+    :s3_access_key_id,
+    :s3_secret_access_key,
   ].freeze
 
   # Overwrite this method to customize how sites are displayed
