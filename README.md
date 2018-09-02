@@ -17,6 +17,11 @@ This is a Rails app that will eventually power my tiny DIY content distribution 
 
 ## Changelog
 
+### 2018-09-02
+
+* Add log shipping to papertrail
+* Add S3 sync sites
+
 ### 2018-08-30
 
 * Made the cache last forever
