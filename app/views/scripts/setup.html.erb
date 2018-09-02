@@ -3,7 +3,7 @@ set -e
 set -o pipefail
 
 apt-get update
-apt-get install -y nginx unzip
+apt-get install -y nginx unzip logrotate
 
 mkdir -p /var/nginx/cache
 rm -f /etc/nginx/sites-enabled/default
@@ -23,6 +23,37 @@ curl -s -S -k -H 'Authorization: Bearer <%= @current_proxy.api_key %>' "https://
 EOF
 
 chmod +x /root/update_proxy.sh
+
+<% if ENV['PAPERTRAIL_PORT'].present? %>
+pushd /tmp
+
+curl -L https://github.com/papertrail/remote_syslog2/releases/download/v0.20/remote_syslog_linux_amd64.tar.gz > remote_syslog.tar.gz
+
+tar xvzf remote_syslog.tar.gz
+cp remote_syslog/remote_syslog /usr/local/bin
+popd
+
+cat <<'EOF' > /etc/log_files.yml
+files:
+  - /var/log/nginx/*.log
+destination:
+  host: logs.papertrailapp.com
+  port: <%= ENV['PAPERTRAIL_PORT'] %>
+  protocol: tls
+EOF
+<% end %>
+
+<% if ENV['PAPERTRAIL_TOKEN'].present? %>
+wget -qO - --header="X-Papertrail-Token: <%= ENV['PAPERTRAIL_TOKEN'] %>" \
+     https://papertrailapp.com/destinations/<%= ENV['PAPERTRAIL_DESTINATION'] %>/setup.sh > /tmp/setup.sh
+
+bash /tmp/setup.sh -q
+
+curl -L https://raw.githubusercontent.com/papertrail/remote_syslog2/master/examples/remote_syslog.systemd.service > /etc/systemd/system/remote_syslog.service
+
+systemctl enable remote_syslog.service
+systemctl start remote_syslog.service
+<% end %>
 
 cat <<EOF > /etc/cron.d/proxy-update
 * * * * * root /root/update_proxy.sh
