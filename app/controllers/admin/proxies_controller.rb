@@ -20,7 +20,7 @@ module Admin
 
     def force_setup
       Proxy.find_each do |proxy|
-        proxy.update_column(needs_setup: true)
+        proxy.update_column(:needs_setup, true)
       end
 
       redirect_to :index, notice: "Forced setup"
