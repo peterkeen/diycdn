@@ -15,7 +15,7 @@ cat <<'EOF' > /root/update_proxy.sh
 set -e
 set -o pipefail
 
-nif [[ -f /etc/nginx/certificates.zip ]]; then
+if [[ -f /etc/nginx/certificates.zip ]]; then
     last_modified=`stat -c %Y /etc/nginx/certificates.zip`
 fi
 
