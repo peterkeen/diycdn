@@ -12,7 +12,7 @@ class RefreshRecordsWorker
 
     zones = route53.list_hosted_zones(max_items: 100).hosted_zones
 
-    domains = Site.where("(upstream is not null and upstream != '') or (s3_bucket is not nulland s3_bucket != ''").pluck(:domain_list).map { |dl| dl.split(/\s+/).map(&:strip) }.flatten
+    domains = Site.where("(upstream is not null and upstream != '') or (s3_bucket is not null and s3_bucket != ''").pluck(:domain_list).map { |dl| dl.split(/\s+/).map(&:strip) }.flatten
     proxies = Proxy.where('certificates_only is null or certificates_only = false').all
 
     zones.each do |zone|
