@@ -51,6 +51,10 @@ bash /tmp/setup.sh -q
 
 curl -L https://raw.githubusercontent.com/papertrail/remote_syslog2/master/examples/remote_syslog.systemd.service > /etc/systemd/system/remote_syslog.service
 
+cat <<'EOF' > /etc/rsyslog.d/00-set-fqdn.conf
+$PreserveFQDN on
+EOF
+
 systemctl enable remote_syslog.service
 systemctl start remote_syslog.service
 <% end %>
