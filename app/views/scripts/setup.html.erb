@@ -3,7 +3,7 @@ set -e
 set -o pipefail
 
 apt-get update
-apt-get install -y nginx unzip logrotate s3cmd
+apt-get install -y nginx unzip logrotate s3cmd fail2ban
 
 mkdir -p /var/nginx/cache
 rm -f /etc/nginx/sites-enabled/default
