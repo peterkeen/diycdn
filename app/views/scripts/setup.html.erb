@@ -19,7 +19,7 @@ if [[ -f /etc/nginx/certificates.zip ]]; then
     last_modified=`stat -c %Y /etc/nginx/certificates.zip`
 fi
 
-curl -s -S -k -H 'Authorization: Bearer <%= @current_proxy.api_key %>' "https://cdn.kodos.zrail.net/update?m=$last_modified" | bash
+curl -s -S -k -H 'Authorization: Bearer <%= @current_proxy.api_key %>' "https://cdn.kodos.zrail.net/update?m=$last_modified" | bash 2>&1 | logger -t update-proxy
 EOF
 
 chmod +x /root/update_proxy.sh
