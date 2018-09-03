@@ -15,7 +15,7 @@ cat <<'EOF' > /root/update_proxy.sh
 set -e
 set -o pipefail
 
-if [[ -f /etc/nginx/certificates.zip ]]; then
+nif [[ -f /etc/nginx/certificates.zip ]]; then
     last_modified=`stat -c %Y /etc/nginx/certificates.zip`
 fi
 
@@ -62,5 +62,7 @@ systemctl start remote_syslog.service
 cat <<EOF > /etc/cron.d/proxy-update
 * * * * * root /root/update_proxy.sh
 EOF
+
+systemctl restart rsyslog
 
 /root/update_proxy.sh
