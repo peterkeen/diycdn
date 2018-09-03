@@ -7,7 +7,7 @@ class Site < ApplicationRecord
 
   scope :configurable, -> {
     with_certificate
-      .where('(upstream is not null and upstream != ?) or push', '')
+      .where('(upstream is not null and upstream != ?) or (s3_bucket is not null and s3_bucket != ?) or push', '', '')
   }
 
   def refresh_certificate!
