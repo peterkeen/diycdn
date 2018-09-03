@@ -26,7 +26,7 @@ systemctl restart nginx
 
 <% Site.where('s3_bucket is not null').each do |site| %>
 mkdir -p /var/www/site-<%= site.id %>
-s3cmd --access_key='<%= site.s3_access_key_id %>' --secret_key='<%= site.s3_secret_access_key %>' sync --remove-deleted s3://<%= site.s3_bucket %> /var/www/site-<%= site.id %>/
+s3cmd --access_key='<%= site.s3_access_key_id %>' --secret_key='<%= site.s3_secret_access_key %>' sync --delete-removed s3://<%= site.s3_bucket %> /var/www/site-<%= site.id %>/
 <% end %>
 
 <% end %>
