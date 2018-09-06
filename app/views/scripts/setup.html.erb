@@ -2,6 +2,8 @@
 set -e
 set -o pipefail
 
+export PATH=$PATH:/usr/local/sbin:/usr/sbin:/sbin
+
 apt-get update
 apt-get install -y nginx unzip logrotate s3cmd fail2ban unattended-upgrades update-notifier-common
 
