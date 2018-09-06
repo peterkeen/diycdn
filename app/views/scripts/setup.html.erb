@@ -3,7 +3,7 @@ set -e
 set -o pipefail
 
 apt-get update
-apt-get install -y nginx unzip logrotate s3cmd fail2ban
+apt-get install -y nginx unzip logrotate s3cmd fail2ban unattended-upgrades update-notifier-common
 
 mkdir -p /var/nginx/cache
 rm -f /etc/nginx/sites-enabled/default
@@ -61,6 +61,44 @@ systemctl start remote_syslog.service
 
 cat <<EOF > /etc/cron.d/proxy-update
 * * * * * root /root/update_proxy.sh
+EOF
+
+cat <<EOF > /etc/apt/apt.conf.d/20auto-upgrades
+APT::Periodic::Update-Package-Lists "1";
+APT::Periodic::Unattended-Upgrade "1";
+EOF
+
+cat <<EOF > /etc/apt/apt.conf.d/50unattended-upgrades
+// Automatically upgrade packages from these (origin, archive) pairs
+Unattended-Upgrade::Allowed-Origins {    
+    // ${distro_id} and ${distro_codename} will be automatically expanded
+    "${distro_id} stable";
+    "${distro_id} ${distro_codename}-security";
+    "${distro_id} ${distro_codename}-updates";
+//  "${distro_id} ${distro_codename}-proposed-updates";
+};
+
+// List of packages to not update
+Unattended-Upgrade::Package-Blacklist {
+//  "vim";
+//  "libc6";
+//  "libc6-dev";
+//  "libc6-i686";
+};
+
+// Send email to this address for problems or packages upgrades
+// If empty or unset then no email is sent, make sure that you 
+// have a working mail setup on your system. The package 'mailx'
+// must be installed or anything that provides /usr/bin/mail.
+//Unattended-Upgrade::Mail "root@localhost";
+
+// Do automatic removal of new unused dependencies after the upgrade
+// (equivalent to apt-get autoremove)
+Unattended-Upgrade::Remove-Unused-Dependencies "true";
+
+// Automatically reboot *WITHOUT CONFIRMATION* if a 
+// the file /var/run/reboot-required is found after the upgrade 
+Unattended-Upgrade::Automatic-Reboot "true";
 EOF
 
 systemctl restart rsyslog
