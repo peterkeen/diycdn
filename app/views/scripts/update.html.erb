@@ -14,7 +14,10 @@ curl -s -S -H 'Authorization: Bearer <%= @current_proxy.api_key %>' https://cdn.
 unzip -qq -o certificates.zip
 
 <% unless @current_proxy.certificates_only? %>
-curl -s -S -H 'Authorization: Bearer <%= @current_proxy.api_key %>' https://cdn.kodos.zrail.net/configurations > sites-enabled/proxies.conf
+curl -s -S -H 'Authorization: Bearer <%= @current_proxy.api_key %>' https://cdn.kodos.zrail.net/configurations > /tmp/proxies.conf
+if [[ -s /tmp/proxies.conf ]]; then
+    mv /tmp/proxies.conf sites-enabled/proxies.conf
+fi
 <% end %>
 
 <% Site.configurable.where(push: true).each do |site| %>
