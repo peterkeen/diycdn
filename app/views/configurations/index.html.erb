@@ -25,7 +25,7 @@ server {
 
   ssl_dhparam /etc/nginx/dhparam.pem;
 
-  server_name <%= site.server_name %>;
+  server_name <%= site.primary_server_name %>;
 
   if ($ssl_protocol = "") {
      rewrite ^(.*)$ https://$server_name$request_uri? permanent;
@@ -64,4 +64,25 @@ server {
     <% end %>
   }
 }
+
+<% if site.secondary_server_name.length > 0 %>
+server {
+  listen 80;
+  listen 443 ssl http2;
+
+  listen [::]:80;
+  listen [::]:443 ssl http2;
+
+  ssl_certificate /etc/nginx/certificates/site-<%= site.id %>/fullchain.pem;
+  ssl_certificate_key /etc/nginx/certificates/site-<%= site.id %>/privkey.pem;
+
+  ssl_ciphers EECDH+CHACHA20:EECDH+AES128:RSA+AES128:EECDH+AES256:RSA+AES256:EECDH+3DES:RSA+3DES:!MD5;
+
+  ssl_dhparam /etc/nginx/dhparam.pem;
+
+  server_name <%= site.secondary_server_name %>;
+  return 301 https://<%= site.primary_server_name%>$request_uri;
+}
+<% end %>
+
 <% end %>

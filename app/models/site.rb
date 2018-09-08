@@ -14,8 +14,20 @@ class Site < ApplicationRecord
     RefreshCertificateWorker.perform_async(self.id)
   end
 
+  def server_name_list
+    domain_list.strip.split(/\s+/)
+  end
+
   def server_name
-    domain_list.split(/\s+/).join(' ')
+    server_name_list.join(' ')
+  end
+
+  def primary_server_name
+    server_name_list.first
+  end
+
+  def secondary_server_name
+    server_name_list.drop(1).join(' ')
   end
 
   def upstream_name
