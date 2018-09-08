@@ -4,17 +4,17 @@ set -e
 set -o pipefail
 
 <% if @current_proxy.needs_setup? %>
-curl -s -S -k -H 'Authorization: Bearer <%= @current_proxy.api_key %>' https://cdn.kodos.zrail.net/setup | bash
+curl -s -S -H 'Authorization: Bearer <%= @current_proxy.api_key %>' https://cdn.kodos.zrail.net/setup | bash
 <% else %>
 
 <% if @should_update %>
 cd /etc/nginx
 
-curl -s -S -k -H 'Authorization: Bearer <%= @current_proxy.api_key %>' https://cdn.kodos.zrail.net/certificates > certificates.zip
+curl -s -S -H 'Authorization: Bearer <%= @current_proxy.api_key %>' https://cdn.kodos.zrail.net/certificates > certificates.zip
 unzip -qq -o certificates.zip
 
 <% unless @current_proxy.certificates_only? %>
-curl -s -S -k -H 'Authorization: Bearer <%= @current_proxy.api_key %>' https://cdn.kodos.zrail.net/configurations > sites-enabled/proxies.conf
+curl -s -S -H 'Authorization: Bearer <%= @current_proxy.api_key %>' https://cdn.kodos.zrail.net/configurations > sites-enabled/proxies.conf
 <% end %>
 
 <% Site.configurable.where(push: true).each do |site| %>
