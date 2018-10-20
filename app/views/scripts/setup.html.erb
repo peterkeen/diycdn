@@ -8,9 +8,12 @@ apt-get update
 apt-get install -y nginx unzip logrotate s3cmd fail2ban unattended-upgrades update-notifier-common sendmail
 
 mkdir -p /var/nginx/cache
+rm -rf /var/nginx/cache/*
 rm -f /etc/nginx/sites-enabled/default
 
 openssl dhparam -out /etc/nginx/dhparam.pem 2048
+
+systemctl service restart nginx 
 
 cat <<'EOF' > /root/update_proxy.sh
 #!/bin/bash
@@ -136,6 +139,6 @@ EOF
 
 systemctl service enable fail2ban
 
-sudo systemctl service start fail2ban
+systemctl service start fail2ban
 
 /root/update_proxy.sh
