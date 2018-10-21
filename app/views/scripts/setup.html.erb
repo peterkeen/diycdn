@@ -11,9 +11,11 @@ mkdir -p /var/nginx/cache
 rm -rf /var/nginx/cache/*
 rm -f /etc/nginx/sites-enabled/default
 
-openssl dhparam -out /etc/nginx/dhparam.pem 2048
+if [[ ! -f /etc/nginx/dhparam.pem ]]; then
+    openssl dhparam -out /etc/nginx/dhparam.pem 2048
+fi
 
-systemctl service restart nginx 
+systemctl restart nginx 
 
 rm /etc/nginx/certificates.zip
 
@@ -139,8 +141,8 @@ maxretry = 5
 bantime = 3600
 EOF
 
-systemctl service enable fail2ban
+systemctl enable fail2ban
 
-systemctl service start fail2ban
+systemctl start fail2ban
 
 /root/update_proxy.sh
