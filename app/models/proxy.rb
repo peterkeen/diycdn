@@ -36,6 +36,7 @@ class Proxy < ApplicationRecord
   end
 
   def valid_internal_ip?(remote_ip)
+    Rails.logger.info("is #{remote_ip} valid for Proxy #{id}?")
     ns = DnsUtils.nameservers(internal_hostname).shuffle.first
     records = DnsUtils.records(internal_hostname, Resolv::DNS::Resource::IN::A, ns).map(&:address).map(&:to_s)
     records.include?(remote_ip)
