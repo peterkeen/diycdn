@@ -15,6 +15,8 @@ openssl dhparam -out /etc/nginx/dhparam.pem 2048
 
 systemctl service restart nginx 
 
+rm /etc/nginx/certificates.zip
+
 cat <<'EOF' > /root/update_proxy.sh
 #!/bin/bash
 set -e
