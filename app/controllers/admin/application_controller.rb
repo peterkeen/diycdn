@@ -14,7 +14,7 @@ module Admin
     #   params[:per_page] || 20
     # end
 
-    before_filter :default_params
+    before_action :default_params
 
     def default_params
       params[:order] ||= "created_at"
