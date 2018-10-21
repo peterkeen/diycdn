@@ -4,7 +4,7 @@ class ApplicationController < ActionController::Base
       token = request.env['HTTP_AUTHORIZATION'].gsub(/^Bearer /, '')
       proxy = Proxy.find_by(api_key: token)
 
-      if proxy && proxy.valid_internal_ip?(request.remote_ip)
+      if proxy && proxy.valid_internal_ip?(request.ip)
         @current_proxy = proxy
         @current_proxy.activate! if @current_proxy.new?
         @current_proxy.update_last_seen
