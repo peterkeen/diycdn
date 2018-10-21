@@ -35,13 +35,6 @@ class Proxy < ApplicationRecord
     external_hostname.split(/\./)[1]
   end
 
-  def valid_internal_ip?(remote_ip)
-    Rails.logger.info("is #{remote_ip} valid for Proxy #{id}?")
-    ns = DnsUtils.nameservers(internal_hostname).shuffle.first
-    records = DnsUtils.records(internal_hostname, Resolv::DNS::Resource::IN::A, ns).map(&:address).map(&:to_s)
-    records.include?(remote_ip)
-  end
-
   def update_last_seen
     update_column :last_seen_at, Time.now.utc
   end
