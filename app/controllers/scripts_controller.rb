@@ -10,6 +10,7 @@ class ScriptsController < ApplicationController
     if params[:m]
       last_modified = Time.at(params[:m].to_i).utc
       @should_update = [Proxy.maximum(:updated_at).utc, Site.maximum(:updated_at).utc, File.mtime(Rails.root).utc].max > last_modified
+      @should_update_static_sites = Time.utc.now.min % 5 == 0
     else
       @should_update = true
     end
