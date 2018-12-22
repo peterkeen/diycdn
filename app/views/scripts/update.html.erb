@@ -27,7 +27,7 @@ fi
 mkdir -p /var/www/site-<% site.id %>
 <% end %>
 
-systemctl restart nginx
+systemctl restart nginx || systemctl start nginx
 <% end %>
 
 <% if @should_update_static_sites %>
