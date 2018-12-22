@@ -112,6 +112,11 @@ EOF
 
 systemctl restart rsyslog
 
+cat <<EOF > /etc/fail2ban/filter.d/nginx-req-limit.conf
+[Definition]
+failregex = limiting requests, excess:.* by zone.*client: <HOST>
+EOF
+
 cat <<EOF > /etc/fail2ban/jail.local
 [DEFAULT]
 
@@ -139,6 +144,15 @@ findtime = 600
 maxretry = 5
 # the number of seconds that a host is banned for.
 bantime = 3600
+
+[nginx-req-limit]
+enabled = true
+filter = nginx-req-limit
+action = iptables-multiport[name=ReqLimit, port="http,https", protocol=tcp]
+logpath = /var/log/nginx/*error.log
+findtime = 600
+bantime = 7200
+maxretry = 10
 EOF
 
 systemctl enable fail2ban
