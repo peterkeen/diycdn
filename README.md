@@ -62,3 +62,4 @@ Next steps:
 * log rotate + remote_syslog2
 * coordinate proxy admin with capistrano
 * investigate SSH certificate authority
+

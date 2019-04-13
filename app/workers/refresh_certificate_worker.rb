@@ -19,10 +19,15 @@ class RefreshCertificateWorker
 
   attr_reader :site
 
+  def self.private_key
+    return ENV['ACME_PRIVATE_KEY'] if ENV['ACME_PRIVATE_KEY'].present?
+    File.read(ENV['ACME_PRIVATE_KEY_PATH'])
+  end
+
   def perform(site_id)
     @site = Site.find(site_id)
 
-    key = OpenSSL::PKey::RSA.new(File.read(ENV['ACME_PRIVATE_KEY_PATH']))
+    key = OpenSSL::PKey::RSA.new(self.class.private_key)
     client = Acme::Client.new(private_key: key, directory: ENV['ACME_DIRECTORY'])
     domain_list = site.domains
 

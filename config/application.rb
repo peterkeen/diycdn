@@ -15,5 +15,7 @@ module Apps
     # Application configuration can go into files in config/initializers
     # -- all .rb files in that directory are automatically loaded after loading
     # the framework and any gems in your application.
+
+    config.x.cdn_master_host = ENV['CDN_MASTER_HOST']
   end
 end
