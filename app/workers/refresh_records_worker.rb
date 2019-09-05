@@ -36,7 +36,11 @@ class RefreshRecordsWorker
         }
       }
 
-      route53.change_resource_record_sets(opts)
+      begin
+        route53.change_resource_record_sets(opts)
+      rescue => e
+        Rails.logger.error(e)
+      end
     end
   end
 
