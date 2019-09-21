@@ -17,7 +17,7 @@ fi
 
 systemctl restart nginx 
 
-rm /etc/nginx/certificates.zip
+rm -f /etc/nginx/certificates.zip
 
 cat <<'EOF' > /root/update_proxy.sh
 #!/bin/bash
