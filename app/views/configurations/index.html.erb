@@ -45,7 +45,9 @@ server {
 
     proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
     proxy_set_header X-Forwarded-Proto $scheme;
+    <% unless site.skip_host_header %>
     proxy_set_header Host $http_host;
+    <% end %>
     proxy_set_header Connection "";
     proxy_redirect off;
 
