@@ -60,7 +60,7 @@ class RefreshRecordsWorker
             type: record_type,
             ttl: 60,
             region: region,
-            set_identifier: "zone #{zone.id} region #{proxy.region} cleaner",
+            set_identifier: "zone #{zone.id} region #{region} cleaner",
             resource_records: record_set.resource_records.map { |r|
               next if all_known_ips.include?(r.value)
               { value: r.value }
