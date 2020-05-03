@@ -20,10 +20,12 @@ class RefreshRecordsWorker
 
       changes = []
       matches.each do |match|
-        proxies.each do |proxy|
-          [['A', :ipv4], ['AAAA', :ipv6]].each do |record_type, method|
+        [['A', :ipv4], ['AAAA', :ipv6]].each do |record_type, method|
+          proxies.each do |proxy|
             changes << change(match, proxy, record_type, method, zone, route53)
           end
+
+          changes << clean_old_proxy_records(match, proxies, record_type, method, zone, route53)
         end
       end
 
@@ -44,6 +46,32 @@ class RefreshRecordsWorker
     end
   end
 
+  def clean_old_proxy_records(label, proxies, record_type, method, zone, route53)
+    all_known_ips = proxies.flat_map { |p| p.send(method) }
+    all_label_ips = route53.list_resource_record_sets(hosted_zone_id: zone.id, start_record_type: record_type, start_record_name: label).map(&:resource_record_sets).flatten.select { |r| r.type == record_type }.map { |r| r.resource_records }.flatten.map(&:value)
+
+    puts ['known'] + all_known_ips
+    puts ['label'] + all_label_ips
+
+    to_delete = all_label_ips - all_known_ips
+
+    return if to_delete.length == 0
+
+    {
+      action: 'DELETE',
+      resource_record_set: {
+        name: label,
+        type: record_type,
+        ttl: 60,
+        region: proxy.region,
+        set_identifier: "zone #{zone.id} region #{proxy.region} cleaner",
+        resource_records: to_delete.map { |ip|
+          { value: ip }
+        }
+      }
+    }
+  end
+
   def change(label, proxy, record_type, method, zone, route53)
     proxy_ips = proxy.send(method)
 
@@ -60,7 +88,7 @@ class RefreshRecordsWorker
             { value: ip }
           }
         }
-      }      
+      }
     else
       {
         action: 'UPSERT',
@@ -81,7 +109,7 @@ class RefreshRecordsWorker
   def needs_delete?(label, proxy, record_type, method, zone, route53)
     return false if proxy.active?
 
-    ips = route53.list_resource_record_sets(hosted_zone_id: zone.id, start_record_type: record_type, start_record_name: label).map(&:resource_record_sets).flatten.select { |r| r.type == record_type }.map { |r| r.resource_records }.flatten.map(&:value)    
+    ips = route53.list_resource_record_sets(hosted_zone_id: zone.id, start_record_type: record_type, start_record_name: label).map(&:resource_record_sets).flatten.select { |r| r.type == record_type }.map { |r| r.resource_records }.flatten.map(&:value)
 
     proxy_ips = Set.new(proxy.send(method))
 
