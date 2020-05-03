@@ -26,7 +26,6 @@ class RefreshRecordsWorker
           end
 
           cleaners = clean_old_proxy_records(match, proxies, record_type, method, zone, route53)
-          pp cleaners
 
           changes += cleaners
         end
