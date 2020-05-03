@@ -47,28 +47,31 @@ class RefreshRecordsWorker
   end
 
   def clean_old_proxy_records(label, proxies, record_type, method, zone, route53)
-    all_known_ips = proxies.where(region: region).flat_map { |p| p.send(method) }
-    all_records = route53.list_resource_record_sets(hosted_zone_id: zone.id, start_record_type: record_type, start_record_name: label).map(&:resource_record_sets).flatten.select { |r| r.type == record_type && r.region == region }.map { |r| r.resource_records }
+    all_records = route53.list_resource_record_sets(hosted_zone_id: zone.id, start_record_type: record_type, start_record_name: label).map(&:resource_record_sets).flatten.select { |r| r.type == record_type }.map { |r| r.resource_records }
 
-    records_to_delete = all_records.reject { |r| all_known_ips.include?(r.value) }
+    all_records.group_by(&:region).map do |region, records|
+      all_known_ips = proxies.where(region: region).map { |p| p.send(method) }
 
-    return [] if records_to_delete.length == 0
+      records_to_delete = records.reject { |r| all_known_ips.include?(r.value) }
 
-    records_to_delete.group_by(&:region).map do |region, records|
-      {
-        action: 'DELETE',
-        resource_record_set: {
-          name: label,
-          type: record_type,
-          ttl: 60,
-          region: region,
-          set_identifier: "zone #{zone.id} region #{proxy.region} cleaner",
-          resource_records: records.map { |r|
-            { value: r.value }
+      if records_to_delete.length == 0
+        nil
+      else
+        {
+          action: 'DELETE',
+          resource_record_set: {
+            name: label,
+            type: record_type,
+            ttl: 60,
+            region: region,
+            set_identifier: "zone #{zone.id} region #{proxy.region} cleaner",
+            resource_records: records_to_delete.map { |r|
+              { value: r.value }
+            }
           }
         }
-      }
-    end
+      end
+    end.compact
   end
 
   def change(label, proxy, record_type, method, zone, route53)
