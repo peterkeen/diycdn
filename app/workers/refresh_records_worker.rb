@@ -47,7 +47,7 @@ class RefreshRecordsWorker
   end
 
   def clean_old_proxy_records(label, proxies, record_type, method, zone, route53)
-    all_records = route53.list_resource_record_sets(hosted_zone_id: zone.id, start_record_type: record_type, start_record_name: label).map(&:resource_record_sets).flatten.select { |r| r.type == record_type }.map { |r| r.resource_records }
+    all_records = route53.list_resource_record_sets(hosted_zone_id: zone.id, start_record_type: record_type, start_record_name: label).map(&:resource_record_sets).flatten.select { |r| r.type == record_type }.map { |r| r.resource_records }.flatten
 
     all_records.group_by(&:region).map do |region, records|
       all_known_ips = proxies.where(region: region).map { |p| p.send(method) }
