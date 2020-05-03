@@ -72,7 +72,7 @@ class RefreshRecordsWorker
         }
       end
 
-      deletions.select { |d| d[:resource_record_set][:resource_records].length > 0 }      
+      deletions.select { |d| d[:resource_record_set][:resource_records].length > 0 }.uniq
     end.flatten
   end
 
