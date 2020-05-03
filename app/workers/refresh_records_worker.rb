@@ -47,16 +47,12 @@ class RefreshRecordsWorker
   end
 
   def clean_old_proxy_records(label, proxies, record_type, method, zone, route53)
-    all_records = route53.list_resource_record_sets(hosted_zone_id: zone.id, start_record_type: record_type, start_record_name: label).map(&:resource_record_sets).flatten.select { |r| r.type == record_type }.map { |r| r.resource_records }.flatten
+    all_record_sets = route53.list_resource_record_sets(hosted_zone_id: zone.id, start_record_type: record_type, start_record_name: label).map(&:resource_record_sets).flatten.select { |r| r.type == record_type }
 
-    all_records.group_by(&:region).map do |region, records|
+    all_record_sets.group_by(&:region).map do |region, record_sets|
       all_known_ips = proxies.where(region: region).map { |p| p.send(method) }
 
-      records_to_delete = records.reject { |r| all_known_ips.include?(r.value) }
-
-      if records_to_delete.length == 0
-        nil
-      else
+      deletions = record_sets.map do |record_set|
         {
           action: 'DELETE',
           resource_record_set: {
@@ -65,13 +61,16 @@ class RefreshRecordsWorker
             ttl: 60,
             region: region,
             set_identifier: "zone #{zone.id} region #{proxy.region} cleaner",
-            resource_records: records_to_delete.map { |r|
+            resource_records: record_set.resource_records.map { |r|
+              next if all_known_ips.include?(r.value)
               { value: r.value }
-            }
+            }.compact
           }
         }
       end
-    end.compact
+
+      deletions.select { |d| d[:resource_record_set][:resource_records].length > 0 }      
+    end.flatten
   end
 
   def change(label, proxy, record_type, method, zone, route53)
