@@ -50,7 +50,7 @@ class RefreshRecordsWorker
     all_record_sets = route53.list_resource_record_sets(hosted_zone_id: zone.id, start_record_type: record_type, start_record_name: label).map(&:resource_record_sets).flatten.select { |r| r.type == record_type }
 
     all_record_sets.group_by(&:region).map do |region, record_sets|
-      all_known_ips = proxies.where(region: region).map { |p| p.send(method) }
+      all_known_ips = proxies.select { |p| p.region == region }&.map { |p| p.send(method) } || []
 
       deletions = record_sets.map do |record_set|
         {
