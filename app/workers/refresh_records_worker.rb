@@ -25,7 +25,7 @@ class RefreshRecordsWorker
             changes << change(match, proxy, record_type, method, zone, route53)
           end
 
-          changes << clean_old_proxy_records(match, proxies, record_type, method, zone, route53)
+          changes += clean_old_proxy_records(match, proxies, record_type, method, zone, route53)
         end
       end
 
@@ -47,29 +47,28 @@ class RefreshRecordsWorker
   end
 
   def clean_old_proxy_records(label, proxies, record_type, method, zone, route53)
-    all_known_ips = proxies.flat_map { |p| p.send(method) }
-    all_label_ips = route53.list_resource_record_sets(hosted_zone_id: zone.id, start_record_type: record_type, start_record_name: label).map(&:resource_record_sets).flatten.select { |r| r.type == record_type }.map { |r| r.resource_records }.flatten.map(&:value)
+    all_known_ips = proxies.where(region: region).flat_map { |p| p.send(method) }
+    all_records = route53.list_resource_record_sets(hosted_zone_id: zone.id, start_record_type: record_type, start_record_name: label).map(&:resource_record_sets).flatten.select { |r| r.type == record_type && r.region == region }.map { |r| r.resource_records }
 
-    puts ['known'] + all_known_ips
-    puts ['label'] + all_label_ips
+    records_to_delete = all_records.reject { |r| all_known_ips.include?(r.value) }
 
-    to_delete = all_label_ips - all_known_ips
+    return [] if records_to_delete.length == 0
 
-    return if to_delete.length == 0
-
-    {
-      action: 'DELETE',
-      resource_record_set: {
-        name: label,
-        type: record_type,
-        ttl: 60,
-        region: proxy.region,
-        set_identifier: "zone #{zone.id} region #{proxy.region} cleaner",
-        resource_records: to_delete.map { |ip|
-          { value: ip }
+    records_to_delete.group_by(&:region).map do |region, records|
+      {
+        action: 'DELETE',
+        resource_record_set: {
+          name: label,
+          type: record_type,
+          ttl: 60,
+          region: region,
+          set_identifier: "zone #{zone.id} region #{proxy.region} cleaner",
+          resource_records: records.map { |r|
+            { value: r.value }
+          }
         }
       }
-    }
+    end
   end
 
   def change(label, proxy, record_type, method, zone, route53)
