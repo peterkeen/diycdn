@@ -98,7 +98,9 @@ class RefreshCertificateWorker
     Rails.logger.info "action=refresh site=#{site.id} status=waiting_for_certificate"
     sleep(1) while order.status == 'processing'
 
-    site.certificate = order.certificate
+    certificate = OpenSSL::X509::Certificate.new(order.certificate)
+
+    site.certificate = certificate.to_s
     site.save!
 
     Rails.logger.info "action=refresh site=#{site.id} status=success"
