@@ -19,39 +19,52 @@ class RefreshRecordsWorker
       matches = domains.select { |d| (d + '.').ends_with?(zone.name) }
 
       changes = []
+      cleaners = []
+
       matches.each do |match|
         [['A', :ipv4], ['AAAA', :ipv6]].each do |record_type, method|
           proxies.each do |proxy|
             changes << change(match, proxy, record_type, method, zone, route53)
           end
 
-          cleaners = clean_old_proxy_records(match, proxies, record_type, method, zone, route53)
-
-          changes += cleaners
+          cleaners += clean_old_proxy_records(match, proxies, record_type, method, zone, route53)
         end
       end
 
-      next if changes.length < 1
-
-      opts = {
-        hosted_zone_id: zone.id,
-        change_batch: {
-          changes: changes
+      if cleaners.length > 0
+        opts = {
+          hosted_zone_id: zone.id,
+          change_batch: {
+            changes: cleaners
+          }
         }
-      }
+  
+        begin
+          route53.change_resource_record_sets(opts)
+        rescue => e
+          Rails.logger.error(e)
+        end
+      end
 
-      begin
-        route53.change_resource_record_sets(opts)
-      rescue => e
-        Rails.logger.error(e)
+      if changes.length > 0
+        opts = {
+          hosted_zone_id: zone.id,
+          change_batch: {
+            changes: changes
+          }
+        }
+  
+        begin
+          route53.change_resource_record_sets(opts)
+        rescue => e
+          Rails.logger.error(e)
+        end
       end
     end
   end
 
   def clean_old_proxy_records(label, proxies, record_type, method, zone, route53)
     all_record_sets = route53.list_resource_record_sets(hosted_zone_id: zone.id, start_record_type: record_type, start_record_name: label).map(&:resource_record_sets).flatten.select { |r| r.type == record_type }
-
-    Rails.logger.info(all_record_sets.inspect)
 
     all_record_sets.group_by(&:region).map do |region, record_sets|
       next if region.nil? || region == ''
