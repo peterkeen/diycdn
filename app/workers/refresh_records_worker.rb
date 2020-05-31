@@ -74,7 +74,7 @@ class RefreshRecordsWorker
       end
 
       deletions.select { |d| d[:resource_record_set][:resource_records].length > 0 }.uniq
-    end.flatten
+    end.compact.flatten
   end
 
   def change(label, proxy, record_type, method, zone, route53)
