@@ -51,6 +51,8 @@ class RefreshRecordsWorker
   def clean_old_proxy_records(label, proxies, record_type, method, zone, route53)
     all_record_sets = route53.list_resource_record_sets(hosted_zone_id: zone.id, start_record_type: record_type, start_record_name: label).map(&:resource_record_sets).flatten.select { |r| r.type == record_type }
 
+    Rails.logger.info(all_record_sets.inspect)
+
     all_record_sets.group_by(&:region).map do |region, record_sets|
       next if region.nil? || region == ''
 
