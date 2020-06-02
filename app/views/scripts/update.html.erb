@@ -4,20 +4,20 @@ set -e
 set -o pipefail
 
 <% if @current_proxy.needs_setup? %>
-curl -s -S -H 'Authorization: Bearer <%= @current_proxy.api_key %>' <%= Rails.application.config.x.cdn_master_host %>/setup | bash
+curl -k -s -S -H 'Authorization: Bearer <%= @current_proxy.api_key %>' <%= Rails.application.config.x.cdn_master_host %>/setup | bash
 <% else %>
 
 <% if @should_update %>
 cd /etc/nginx
 
-curl -s -S -H 'Authorization: Bearer <%= @current_proxy.api_key %>' <%= Rails.application.config.x.cdn_master_host %>/certificates > /tmp/certificates.zip
+curl -k -s -S -H 'Authorization: Bearer <%= @current_proxy.api_key %>' <%= Rails.application.config.x.cdn_master_host %>/certificates > /tmp/certificates.zip
 if [[ -s /tmp/certificates.zip ]]; then
     mv /tmp/certificates.zip certificates.zip
     unzip -qq -o certificates.zip
 fi
 
 <% unless @current_proxy.certificates_only? %>
-curl -s -S -H 'Authorization: Bearer <%= @current_proxy.api_key %>' <%= Rails.application.config.x.cdn_master_host %>/configurations > /tmp/proxies.conf
+curl -k -s -S -H 'Authorization: Bearer <%= @current_proxy.api_key %>' <%= Rails.application.config.x.cdn_master_host %>/configurations > /tmp/proxies.conf
 if [[ -s /tmp/proxies.conf ]]; then
     mv /tmp/proxies.conf sites-enabled/proxies.conf
 fi
