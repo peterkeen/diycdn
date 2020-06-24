@@ -78,7 +78,6 @@ server {
     proxy_cache_key $scheme$http_host$proxy_host$request_uri;
 
     # Enables WS support
-    proxy_http_version 1.1;
     proxy_set_header Upgrade $http_upgrade;
     proxy_set_header Connection "upgrade";
 
